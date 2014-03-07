@@ -4,6 +4,13 @@ Varnishlog entries are gathered together into client or backend transactions. Ea
 
 Varnishsentry runs as a daemon service supporting multiple workers. Each worker runs in a separate process, fetching varnishlog entries using `https://github.com/xcir/python-varnishapi <Shohei Tanaka's Python libvarnish API wrapper>`_, and using a customized Sentry DSN and set of filtering rules.
 
+Varnishsentry is sponsored by `Allenta Consulting <http://www.allenta.com>`_, the Varnish Software `partner for Spain and Portugal <https://www.varnish-software.com/partner/allenta-consulting>`_.
+
+How it works?
+=============
+
+Coming soon :)
+
 Why varnishsentry?
 ==================
 
