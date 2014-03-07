@@ -67,7 +67,7 @@ QuickStart
 
     ~$ sudo varnishsentry settings > /etc/varnishsentry.conf
 
-   Edit ``/etc/varnishsentry.conf`` and set your preferences. Don't be afraid. The file is extensibility documented :)
+   Edit ``/etc/varnishsentry.conf`` and set your preferences. Don't be afraid. The file is `extensibility documented <https://github.com/carlosabalde/varnishsentry/blob/master/varnishsentry/conf/default.py>`_ :)
 
 3. Optionally, you can check varnishsentry has been proverly configured running the following command::
 
