@@ -9,7 +9,7 @@ Varnishsentry is sponsored by `Allenta Consulting <http://www.allenta.com>`_, th
 How it works?
 =============
 
-Use the standard Varnish Cache logging capabilities to log error conditions while processing incoming requests::
+Use the standard Varnish Cache logging capabilities to log error, warning, etc. conditions while processing incoming requests::
 
     sub vcl_recv {
         ...
@@ -21,7 +21,7 @@ Use the standard Varnish Cache logging capabilities to log error conditions whil
         ...
     }
 
-Set up varnishsentry (``/etc/varnishsentry.conf``) accordingly to match and submit error conditions::
+Set up varnishsentry (``/etc/varnishsentry.conf``) accordingly to match and submit previously logged messages::
 
 
     ...
@@ -32,7 +32,11 @@ Set up varnishsentry (``/etc/varnishsentry.conf``) accordingly to match and subm
             'dsn': 'http://public:secret@example.com/1',
             'filters': {
                 'VCL_Log': [
-                    ('error', r'^\[ERROR\].*'),
+                    {
+                        'regexp': r'^\[WTF\].*',
+                        'name': 'wtf',
+                        'level': 'warning',
+                    },
                 ],
             },
             'user': 'nobody',
@@ -54,7 +58,7 @@ Why varnishsentry?
 
 Varnish Cache is so flexible that **moving web logic from the backend to the caching layer** is possible (and highly recommended) in some cases. There are strong limitations on what kind of logic can be moved into Varnish Cache, but the logic moved there will be embedded and compiled into Varnish Cache itself, and it will run thousand times faster than in the typical PHP, Python or Java backends.
 
-When moving complex domain logic from the backend to Varnish Cache, at some point you will need to figure out how to deal with error handling, alerting, etc. That's the reason varnishsentry was created for: when dealing with errors in your customized VCL or VMODs, simply use the standard Varnish Cache logging capabilities (i.e. ``std.log(...)`` or ``WSP(sp, SLT_Error, ...)``). Varnishsentry will look for error messages matching some patterns in the varnishd shared memory log, and submit errors together with all available context information to some previously defined Sentry DSN.
+When moving complex domain logic from the backend to Varnish Cache, at some point you will need to figure out how to deal with error handling, alerting, etc. That's the reason varnishsentry was created for: when dealing with errors, warnings, etc. in your customized VCL or VMODs, simply use the standard Varnish Cache logging capabilities (i.e. ``std.log(...)`` or ``WSP(sp, SLT_Error, ...)``). Varnishsentry will look for messages matching some patterns in the varnishd shared memory log, which will be submitted to some previously defined Sentry DSN together with all available context information.
 
 QuickStart
 ==========

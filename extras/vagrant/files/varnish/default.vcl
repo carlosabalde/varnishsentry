@@ -7,6 +7,6 @@ backend default {
 
 sub vcl_recv {
     if (std.random(0, 100) < 50) {
-        std.log("[ERROR] We have just flipped a coin and it has landed on the bad side!");
+        std.log("[WTF] We have just flipped a coin and it has landed on the bad side!");
     }
 }

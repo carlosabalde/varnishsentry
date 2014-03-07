@@ -25,11 +25,8 @@ from varnishsentry.worker import Worker
 #     in varnishlog output?
 #       - https://www.varnish-cache.org/docs/3.0/reference/varnishlog.html
 #
-#   - Include separate field (e.g. 'errors') with matched items.
-#
-#   - Custom log message to include custom tags?
-#
-#   - Custom log message to select level?
+#   - Include separate field (e.g. 'matched') with all matched items? Continue
+#     matching after the first match and use most serious level?
 #
 #   - Can transaction delimiter be improved? Any other approach to gather items?
 #
@@ -51,6 +48,8 @@ TRANSACTIONS = {
 }
 
 DEFAULT_TIMEOUT = 5
+
+FILTER_LEVELS = ('fatal', 'error', 'warning', 'info', 'debug')
 
 
 class Consumer(Worker):
@@ -83,11 +82,30 @@ class Consumer(Worker):
 
         # Initialize tx filters.
         self._filters = {}
-        for tag, regexps in self._config.get('filters', {}).iteritems():
+        for tag, filters in self._config.get('filters', {}).iteritems():
+            tag = self._vap.VSL_NameNormalize(tag)
             items = []
-            for label, regexp in regexps:
-                items.append((label, re.compile(regexp)))
-            self._filters[self._vap.VSL_NameNormalize(tag)] = items
+            for filter in filters:
+                # Check regular expression.
+                assert \
+                    'regexp' in filter, \
+                    'All filters must contain a matching regexp.'
+
+                # Build filter.
+                item = {
+                    'regexp': re.compile(filter['regexp']),
+                    'name': filter.get('name', tag),
+                    'level': filter.get('level', 'error'),
+                }
+
+                # Check level value.
+                assert \
+                    item['level'] in FILTER_LEVELS, \
+                    '"%s" is not a valid filter level.' % item['level']
+
+                # Append filter.
+                items.append(item)
+            self._filters[tag] = items
 
         # Initialize tx buffers.
         self._buffers = dict((type, {}) for type in self._types)
@@ -157,9 +175,13 @@ class Consumer(Worker):
 
                 # Should the tx be published?
                 if not tx.is_matched and item['tag'] in self._filters:
-                    for label, regexp in self._filters[item['tag']]:
-                        if regexp.search(item['msg']):
-                            tx.match(item['tag'], item['msg'], label)
+                    for filter in self._filters[item['tag']]:
+                        if filter['regexp'].search(item['msg']):
+                            tx.match(
+                                item['tag'],
+                                item['msg'],
+                                filter['name'],
+                                filter['level'])
 
                 # Is the tx ending?
                 if item['tag'] in self._delimiters[item['type']]['end']:
@@ -196,9 +218,9 @@ class Consumer(Worker):
                 data={
                     'timestamp': datetime.datetime.fromtimestamp(tx.timestamp),
                     'logger': 'varnishsentry',
-                    'level': 'error',
+                    'level': tx.matched_level,
                     'tags': {
-                        'filter': tx.matched_label,
+                        'filter': tx.matched_name,
                         'type': TRANSACTIONS[tx.type]['name'],
                         'worker': self.name,
                     },
@@ -214,21 +236,24 @@ class Transaction(object):
         self.timestamp = timestamp
         self.type = type
         self.items = []
-        self.matched_label = None
         self.matched_item = None
+        self.matched_name = None
+        self.matched_level = None
 
     def add(self, tag, message):
         self.items.append(self._format_item(tag, message))
 
-    def match(self, tag, message, label):
+    def match(self, tag, message, name, level):
         self.matched_item = self._format_item(tag, message)
-        self.matched_label = label
+        self.matched_name = name
+        self.matched_level = level
 
     @property
     def is_matched(self):
         return \
-            self.matched_label is not None and \
-            self.matched_item is not None
+            self.matched_item is not None and \
+            self.matched_name is not None and \
+            self.matched_level is not None
 
     def _format_item(self, tag, message):
         return '[%(tag)s] %(message)s' % {

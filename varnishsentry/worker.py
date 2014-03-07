@@ -103,13 +103,13 @@ class Worker(multiprocessing.Process):
             self._logging_queue.close()
 
     def _init(self):
-        raise NotImplementedError('Please implement this method')
+        raise NotImplementedError('Please implement this method.')
 
     def _poll(self):
-        raise NotImplementedError('Please implement this method')
+        raise NotImplementedError('Please implement this method.')
 
     def _shutdown(self):
-        raise NotImplementedError('Please implement this method')
+        raise NotImplementedError('Please implement this method.')
 
     def _init_logger(self):
         # Set custom root logger.

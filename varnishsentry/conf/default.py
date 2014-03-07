@@ -28,15 +28,32 @@ WORKERS = {
         'dsn': 'http://public:secret@example.com/1',
 
         # Required: only transactions matching some filter will be submitted to
-        # Sentry. All regular expressions are labeled with a string that will
-        # be used as a tag when delivering some transaction to Sentry. Defaults
-        # to no filters at all (i.e. nothing will be submitted to Sentry).
+        # Sentry. Each filter include a mandatory regular expression and two
+        # optional fields:
+        #
+        #   - A name value, used as a tag when delivering a matching transaction
+        #     to Sentry. Defaults to the VSL tag.
+        #
+        #   - A level (acceptable values are 'fatal', 'error', 'warning', 'info'
+        #     and 'debug') value, used as when delivering a matching transaction
+        #     to Sentry. Defaults to 'error'.
+        #
+        # This option defaults to no filters at all (i.e. nothing will be submitted
+        # to Sentry).
         'filters': {
             'VCL_Log': [
-                ('error', r'^\[ERROR\].*'),
+                {
+                    'regexp': r'^\[WTF\].*',
+                    'name': 'wtf',
+                    'level': 'warning',
+                },
             ],
             'TxStatus': [
-                ('500', r'^500$'),
+                {
+                    'regexp': r'^5\d\d$',
+                    'name': '5xx',
+                    'level': 'error',
+                },
             ],
         },
 
