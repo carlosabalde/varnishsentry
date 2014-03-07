@@ -16,12 +16,23 @@ When moving complex domain logic from the backend to Varnish Cache, at some poin
 QuickStart
 ==========
 
-Coming soon :)
+1. Install varnishsentry and all its dependencies::
 
-Configuration
-=============
+    ~$ pip install varnishsentry
+    
+2. Create a varnishsentry configuration template running the following command::
 
-Coming soon :)
+    ~$ sudo varnishsentry settings > /etc/varnishsentry.conf
+
+   Edit ``/etc/varnishsentry.conf`` and set your preferences. Don't be afraid. The file is extensibility documented :)
+
+3. Optionally, you can check varnishsentry has been proverly configured running the following command::
+
+    ~$ sudo varnishsentry start --debug
+    
+   Wait a few seconds. If you don't see errors hit CTRL+C to exit.
+
+4. In a production environment you should run varnishsentry as an OS service. Use whatever software you are most familiar with, such as upstart, supervisord or a simple init.d script. Check out the `sample init.d script <https://github.com/carlosabalde/varnishsentry/blob/master/extras/init.d/varnishsentry>`_ if you need some inspiration.
 
 Resources
 =========
