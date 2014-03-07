@@ -13,6 +13,26 @@ from raven import Client
 from varnishsentry import api
 from varnishsentry.worker import Worker
 
+#
+# TODO + RANDOM IDEAS:
+#
+#   - Use sentry.interfaces.Http & sentry.interfaces.User.
+#       - http://sentry.readthedocs.org/en/latest/developer/interfaces/
+#       - Custom log message to include user info?
+#
+#   - Clarify varnishlog -O option. Ordering and non interleaving in guaranteed
+#     in varnishlog output?
+#       - https://www.varnish-cache.org/docs/3.0/reference/varnishlog.html
+#
+#   - Human friendly 'type' tag value.
+#
+#   - Include separate field (e.g. 'errors') with matched items.
+#
+#   - Custom log message to include custom tags?
+#
+#   - Can transaction delimiter be improved? Any other approach to gather items?
+#
+
 TRANSACTIONS = {
     # Client tx.
     1: {
