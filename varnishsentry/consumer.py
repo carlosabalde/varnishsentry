@@ -7,6 +7,7 @@
 from __future__ import absolute_import
 import re
 import time
+import datetime
 import logging
 import threading
 from raven import Client
@@ -24,11 +25,11 @@ from varnishsentry.worker import Worker
 #     in varnishlog output?
 #       - https://www.varnish-cache.org/docs/3.0/reference/varnishlog.html
 #
-#   - Human friendly 'type' tag value.
-#
 #   - Include separate field (e.g. 'errors') with matched items.
 #
 #   - Custom log message to include custom tags?
+#
+#   - Custom log message to select level?
 #
 #   - Can transaction delimiter be improved? Any other approach to gather items?
 #
@@ -36,12 +37,14 @@ from varnishsentry.worker import Worker
 TRANSACTIONS = {
     # Client tx.
     1: {
+        'name': 'client',
         'start': ['ReqStart'],
         'end': ['ReqEnd'],
     },
 
     # Backend tx.
     2: {
+        'name': 'backend',
         'start': ['BackendOpen', 'BackendReuse'],
         'end': ['Length', 'BackendClose'],
     },
@@ -144,9 +147,7 @@ class Consumer(Worker):
         if item['type'] in self._types:
             # Is this a brand new transaction?
             if item['tag'] in self._delimiters[item['type']]['start']:
-                self._buffers[item['type']][fd] = Transaction(
-                    now,
-                    item['typeName'])
+                self._buffers[item['type']][fd] = Transaction(now, item['type'])
 
             # Has we previously seen the tx?
             tx = self._buffers[item['type']].get(fd)
@@ -193,24 +194,25 @@ class Consumer(Worker):
                 'raven.events.Message',
                 message=tx.matched_item,
                 data={
+                    'timestamp': datetime.datetime.fromtimestamp(tx.timestamp),
                     'logger': 'varnishsentry',
+                    'level': 'error',
                     'tags': {
                         'filter': tx.matched_label,
-                        'type': tx.type_name,
+                        'type': TRANSACTIONS[tx.type]['name'],
                         'worker': self.name,
-                    }
+                    },
                 },
                 extra={
-                    'timestamp': tx.timestamp,
                     'timeout': timeout,
                     'items': tx.items,
                 })
 
 
 class Transaction(object):
-    def __init__(self, timestamp, type_name):
+    def __init__(self, timestamp, type):
         self.timestamp = timestamp
-        self.type_name = type_name
+        self.type = type
         self.items = []
         self.matched_label = None
         self.matched_item = None
