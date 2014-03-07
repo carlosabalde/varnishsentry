@@ -4,6 +4,10 @@ build: clean
 	python setup.py build
 	@echo
 
+	@echo
+	@echo "> Build successfully generated in ./build/"
+	@echo
+
 sdist: clean
 	@echo
 	@echo "> Creating Python source distribution package..."
