@@ -61,7 +61,7 @@ QuickStart
 
 1. Install varnishsentry and all its dependencies::
 
-    ~$ pip install varnishsentry
+    ~$ sudo pip install varnishsentry
 
 2. Create a varnishsentry configuration template running the following command::
 

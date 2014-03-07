@@ -55,13 +55,13 @@ WORKERS = {
         'options': {
             '-c': True,
             '-b': True,
-            '-d': False,
-            '-n': 'acme',
+            #'-d': False,
+            #'-n': 'acme',
         },
 
         # Optional: libvarnishapi path may be manually specified. Defaults to
         # 'libvarnishapi.so.1'
-        'libvarnishapi': '/usr/lib/libvarnishapi.so.1',
+        #'libvarnishapi': '/usr/lib/libvarnishapi.so.1',
 
         # Optional: broken transactions are discarded after some timeout. Defaults
         # to 5 seconds.
@@ -75,8 +75,8 @@ WORKERS = {
 
 import logging
 from logging import FileHandler
-#from raven.handlers.logging import SentryHandler
-#from logging.handlers import SysLogHandler
+from raven.handlers.logging import SentryHandler
+from logging.handlers import SysLogHandler
 
 LOGGING = {
     'level': logging.INFO,
@@ -87,17 +87,24 @@ LOGGING = {
         },
     },
     'handlers': [
+        # File handler.
         {
             'class': FileHandler,
             'args': ['/var/log/varnishsentry.log'],
             'formatter': 'verbose',
         },
+
+        # Sentry handler. Uncomment and adjust the DSN URL if you want to
+        # deliver internal varnishsentry log messages to Sentry.
         # {
         #     'class': SentryHandler,
         #     'level': logging.ERROR,
         #     'args': ['http://public:secret@example.com/1'],
         #     'formatter': 'verbose',
         # },
+
+        # Syslog handler. Uncomment and adjust the adddress if you want to
+        # deliver internal varnishsentry log messages to syslog.
         # {
         #    'class': SysLogHandler,
         #    'level': logging.ERROR,
