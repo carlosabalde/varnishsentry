@@ -9,7 +9,41 @@ Varnishsentry is sponsored by `Allenta Consulting <http://www.allenta.com>`_, th
 How it works?
 =============
 
-Coming soon :)
+Use the standard Varnish Cache logging capabilities to log error conditions while processing incoming requests::
+
+    sub vcl_recv {
+        ...
+
+        if (std.random(0, 100) < 50) {
+            std.log("[ERROR] We have just flipped a coin and it has landed on the bad side!");
+        }
+
+        ...
+    }
+
+Set up varnishsentry (``/etc/varnishsentry.conf``) accordingly to match and submit error conditions::
+
+
+    ...
+
+
+    WORKERS = {
+        'test': {
+            'dsn': 'http://public:secret@example.com/1',
+            'filters': {
+                'VCL_Log': [
+                    ('error', r'^\[ERROR\].*'),
+                ],
+            },
+            'user': 'nobody',
+            'group': 'nogroup',
+            ...
+       },
+    }
+
+    ...
+
+And that's it. You will start receiving Sentry alerts including all relevant varnishlog entries in order to do a proper post-mortem analysis.
 
 Why varnishsentry?
 ==================
@@ -26,7 +60,7 @@ QuickStart
 1. Install varnishsentry and all its dependencies::
 
     ~$ pip install varnishsentry
-    
+
 2. Create a varnishsentry configuration template running the following command::
 
     ~$ sudo varnishsentry settings > /etc/varnishsentry.conf
@@ -36,7 +70,7 @@ QuickStart
 3. Optionally, you can check varnishsentry has been proverly configured running the following command::
 
     ~$ sudo varnishsentry start --debug
-    
+
    Wait a few seconds. If you don't see errors hit CTRL+C to exit.
 
 4. In a production environment you should run varnishsentry as an OS service. Use whatever software you are most familiar with, such as upstart, supervisord or a simple init.d script. Check out the `sample init.d script <https://github.com/carlosabalde/varnishsentry/blob/master/extras/init.d/varnishsentry>`_ if you need some inspiration.
