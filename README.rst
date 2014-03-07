@@ -45,6 +45,8 @@ Set up varnishsentry (``/etc/varnishsentry.conf``) accordingly to match and subm
 
 And that's it. You will start receiving Sentry alerts including all relevant varnishlog entries in order to do a proper post-mortem analysis.
 
+.. image:: https://github.com/carlosabalde/varnishsentry/raw/master/extras/screenshot.png
+
 Why varnishsentry?
 ==================
 
@@ -74,8 +76,3 @@ QuickStart
    Wait a few seconds. If you don't see errors hit CTRL+C to exit.
 
 4. In a production environment you should run varnishsentry as an OS service. Use whatever software you are most familiar with, such as upstart, supervisord or a simple init.d script. Check out the `sample init.d script <https://github.com/carlosabalde/varnishsentry/blob/master/extras/init.d/varnishsentry>`_ if you need some inspiration.
-
-Resources
-=========
-
-Coming soon :)
