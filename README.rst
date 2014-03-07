@@ -2,7 +2,7 @@
 
 Varnishlog entries are gathered together into client or backend transactions. Each transaction is matched against a set of configurable filtering regular expressions. Transactions matching any filter are submitted to a Sentry DSN for proper alerting and post-mortem analysis.
 
-Varnishsentry runs as a daemon service supporting multiple workers. Each worker runs in a separate process, fetching varnishlog entries using `https://github.com/xcir/python-varnishapi <Shohei Tanaka's Python libvarnish API wrapper>`_, and using a customized Sentry DSN and set of filtering rules.
+Varnishsentry runs as a daemon service supporting multiple workers. Each worker runs in a separate process, fetching varnishlog entries using `Shohei Tanaka's Python libvarnish API wrapper <https://github.com/xcir/python-varnishapi>`_, and using a customized Sentry DSN and set of filtering rules.
 
 Varnishsentry is sponsored by `Allenta Consulting <http://www.allenta.com>`_, the Varnish Software `partner for Spain and Portugal <https://www.varnish-software.com/partner/allenta-consulting>`_.
 
