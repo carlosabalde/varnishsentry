@@ -4,8 +4,8 @@
 varnishsentry
 =============
 
-varnishsentry allows selective submission of grouped varnishd shared memory
-logs entries to Sentry servers.
+Varnishsentry allows selective submission of grouped varnishd shared memory
+log entries to Sentry DSNs.
 
 Check out https://github.com/carlosabalde/varnishsentry for a detailed
 description, extra documentation and other useful information.
@@ -34,8 +34,8 @@ setup(
     include_package_data=True,
     url='https://github.com/carlosabalde/varnishsentry',
     description=
-        'varnishsentry allows selective submission of grouped varnishd shared '
-        'memory logs entries to Sentry servers.',
+        'Varnishsentry allows selective submission of grouped varnishd shared '
+        'memory log entries to Sentry DSNs.',
     long_description=__doc__,
     license='GPL',
     entry_points={
