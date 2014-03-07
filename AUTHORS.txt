@@ -1,6 +1,9 @@
-varnishsentry developers are:
+Varnishsentry developers are:
 
     - Carlos Abalde <carlos.abalde@gmail.com>
+
+Varnishsentry is sponsored by Allenta Consulting (http://www.allenta.com), the
+Varnish Software partner for Spain and Portugal.
 
 Thanks to Shohei Tanaka for the libvarnish API wrapper embedded in
 this project: https://github.com/xcir/python-varnishapi.
