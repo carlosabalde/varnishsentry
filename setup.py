@@ -27,7 +27,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'requirements
 
 setup(
     name='varnishsentry',
-    version=0.1,
+    version=0.2,
     author='Carlos Abalde',
     author_email='carlos.abalde@gmail.com',
     packages=find_packages(),
