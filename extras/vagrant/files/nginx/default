@@ -1,0 +1,5 @@
+server {
+	listen 8080;
+	root /usr/share/doc/;
+	autoindex on;
+}

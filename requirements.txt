@@ -1,0 +1,4 @@
+distribute
+python-daemon>=1.6
+raven>=4.0.4
+ipython

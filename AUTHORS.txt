@@ -1,0 +1,8 @@
+varnishsentry developers are:
+
+    - Carlos Abalde <carlos.abalde@gmail.com>
+
+Thanks to Shohei Tanaka for the libvarnish API wrapper embedded in
+this project: https://github.com/xcir/python-varnishapi.
+
+Comments, improvements and contributions are welcome! :)
