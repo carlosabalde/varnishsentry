@@ -1,3 +1,8 @@
+v0.3, 07/04/2014
+----------------
+
+  - Improved transaction filtering: full matching.
+
 v0.2, 07/04/2014
 ----------------
 

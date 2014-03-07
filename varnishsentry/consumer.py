@@ -25,9 +25,6 @@ from varnishsentry.worker import Worker
 #     in varnishlog output?
 #       - https://www.varnish-cache.org/docs/3.0/reference/varnishlog.html
 #
-#   - Include separate field (e.g. 'matched') with all matched items? Continue
-#     matching after the first match and use most serious level?
-#
 #   - Can transaction delimiter be improved? Any other approach to gather items?
 #
 
@@ -173,8 +170,8 @@ class Consumer(Worker):
                 # Append the new item to the tx.
                 tx.add(item['tag'], item['msg'])
 
-                # Should the tx be published?
-                if not tx.is_matched and item['tag'] in self._filters:
+                # Try to match the item.
+                if item['tag'] in self._filters:
                     for filter in self._filters[item['tag']]:
                         if filter['regexp'].search(item['msg']):
                             tx.match(
@@ -224,10 +221,36 @@ class Consumer(Worker):
                         'type': TRANSACTIONS[tx.type]['name'],
                         'worker': self.name,
                     },
+                    # 'sentry.interfaces.Message': {
+                    #     'message': 'My raw message with interpreted strings like %s',
+                    #     'params': ['this'],
+                    # },
+                    # 'sentry.interfaces.Http': {
+                    #     'url': 'http://absolute.uri/foo',
+                    #     'method': 'POST',
+                    #     'data': {
+                    #         'foo': 'bar',
+                    #     },
+                    #     'query_string': 'hello=world',
+                    #     'cookies': 'foo=bar',
+                    #     'headers': {
+                    #         'Content-Type': 'text/html',
+                    #     },
+                    #     'env': {
+                    #         'REMOTE_ADDR': '192.168.0.1',
+                    #     },
+                    # },
+                    # 'sentry.interfaces.User': {
+                    #     'id': 'unique_id',
+                    #     'username': 'my_user',
+                    #     'email': 'foo@example.com',
+                    #     'ip_address': '127.0.0.1',
+                    # },
                 },
                 extra={
                     'timeout': timeout,
                     'items': tx.items,
+                    'matched': tx.matched_items,
                 })
 
 
@@ -237,6 +260,7 @@ class Transaction(object):
         self.type = type
         self.items = []
         self.matched_item = None
+        self.matched_items = []
         self.matched_name = None
         self.matched_level = None
 
@@ -244,16 +268,26 @@ class Transaction(object):
         self.items.append(self._format_item(tag, message))
 
     def match(self, tag, message, name, level):
-        self.matched_item = self._format_item(tag, message)
-        self.matched_name = name
-        self.matched_level = level
+        # Format item.
+        matched_item = self._format_item(tag, message)
+
+        # Add to the list of matched items.
+        self.matched_items.append('[%(level)s/%(name)s] %(item)s' % {
+            'name': name,
+            'level': level,
+            'item': matched_item,
+        })
+
+        # Set as the main matched item?
+        if self.matched_item is None or \
+           FILTER_LEVELS.index(level) < FILTER_LEVELS.index(self.matched_level):
+            self.matched_item = matched_item
+            self.matched_name = name
+            self.matched_level = level
 
     @property
     def is_matched(self):
-        return \
-            self.matched_item is not None and \
-            self.matched_name is not None and \
-            self.matched_level is not None
+        return self.matched_item is not None
 
     def _format_item(self, tag, message):
         return '[%(tag)s] %(message)s' % {
