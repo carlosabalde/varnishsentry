@@ -19,7 +19,8 @@ varnishsentry_start () {
 }
 
 varnishsentry_stop () {
-    varnishsentry stop
+    varnishsentry stop \
+        --config="$VARNISHSENTRY_CONFIG"
 }
 
 varnishsentry_restart () {
@@ -28,7 +29,8 @@ varnishsentry_restart () {
 }
 
 varnishsentry_status () {
-    varnishsentry status
+    varnishsentry status \
+        --config="$VARNISHSENTRY_CONFIG"
 }
 
 if [ -n "$VARNISHSENTRY_VIRTUALENV" ]; then
